@@ -3,7 +3,7 @@ name: Create Dev Staging Environment
 on:
   workflow_dispatch:
     inputs:
-      PR_number:
+      PR_number: # Asks for the PR number after manually starting the workflow since we only want to create Staging Environments for specific workflows
         description: 'Pull request number'
         required: true
 
@@ -28,7 +28,7 @@ jobs:
     # ${{ steps.verify_pr_number.outputs.result }}
     # ======================================================
     - name: Verify Pull Request Number
-      uses: actions/github-script@v5
+      uses: actions/github-script@v5 # allows you to write Javascript code inside the .yaml file
       id: verify_pr_number
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,7 +44,7 @@ jobs:
           if (response.data.number !== ${{ github.event.inputs.PR_number }}) {
             throw new Error('Pull request is not open or number is not valid!');
           } else {
-            console.log("PR ref: " + response.data.head.ref);
+            console.log("PR ref: " + response.data.head.ref); // ref is the branch name that is included in the JSON files returned by the gh API call
             return response.data.head.ref;
           }
 
@@ -54,7 +54,7 @@ jobs:
     - uses: actions/checkout@v2
       name: 'Checkout repository and infra branch'
       with:
-        ref: infra
+        ref: infra # Not recommended to maintain infra and application in the same repo
 
     # ======================================================
     # Terraform setup
@@ -141,7 +141,7 @@ jobs:
     - name: Terraform Apply
       id: apply
       working-directory: infra/instances/staging/
-      run: terraform apply -auto-approve
+      run: terraform apply -auto-approve # -auto-approve is important to include for running gh workflows
       
     - name: Terraform Output
       id: apply_output
@@ -177,7 +177,10 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git add ./\*.tf
         git commit -m "Add terraform resource files" && \
-          git push || echo "Nothing to commit"
+          git push || echo "Nothing to commit" 
+# if git push does not find anything to push it will exit with non-zero status, which will cause the workflow to fail
+# In this case its fine if there is nothing to push since there won't always be changes to infrastructure when we run this workflow,
+# so `|| echo "Nothing to commit"` is a nice trick used to bypass the error
 
     # ======================================================
     # Checkout the PR branch so that we can deploy it
@@ -245,5 +248,5 @@ jobs:
     # Otherwise this step will not be executed.
     # ======================================================
     - name: Setup tmate session
-      if: ${{ failure() }}
+      if: ${{ failure() }} # if any of the steps before this fail, trigger this step
       uses: mxschmitt/action-tmate@v3
