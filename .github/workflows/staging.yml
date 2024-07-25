@@ -194,15 +194,16 @@ jobs:
     # We sync the files in this directory to the staging
     # server. We use the `rsync` command to do this.
     # ======================================================
-    - uses: burnett01/rsync-deployments@23a557dceb19f9bb960ef40cf75cab5e9b37ec1f
+    # `rsync` is a command-line tool used for transferring and synchronising files between different locations on a computer or different computers
+    - uses: burnett01/rsync-deployments@23a557dceb19f9bb960ef40cf75cab5e9b37ec1f # this gh action sets up a docker container that has rsync installed
       name: 'Deploy to staging'
       with:
-        switches: -avzr --delete
+        switches: -avzr --delete # deletes whatever in on the VM before we deploy our application. Good practice. 
         path: ./web
         remote_path: /var/app
         remote_host: ${{ steps.apply_output.outputs.stdout }}
         remote_user: ${{ secrets.REMOTE_USER }}
-        remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        remote_key: ${{ secrets.SSH_PRIVATE_KEY }} # to allow us to SSH into the EC2
     
     # ======================================================
     # Once we have the new files synced to the staging server
