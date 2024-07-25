@@ -214,11 +214,11 @@ jobs:
       with:
         hosts: '${{ secrets.REMOTE_USER }}@${{ steps.apply_output.outputs.stdout }}'
         privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
-        command: |
-          cd /var/app/web
-          npm ci
-          pm2 start /var/app/web/bin/www || pm2 restart /var/app/web/bin/www
-          sudo service nginx restart
+        command: | # list of commands to execute on the remote server
+          cd /var/app/web // changes directory to location of web app on the server
+          npm ci // Installs dependencies for Node.js application
+          pm2 start /var/app/web/bin/www || pm2 restart /var/app/web/bin/www // Starts up application with pm2
+          sudo service nginx restart // Restarts Nginx service, a web server that can be used as a reverse proxy, load balancer and HTTP cache
     
     # ======================================================
     # When we're done, we need to update the PR one more time
