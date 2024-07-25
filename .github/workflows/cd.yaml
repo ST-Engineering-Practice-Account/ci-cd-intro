@@ -69,7 +69,7 @@ jobs:
     environment: production
     name: 'Deploy to production'
     runs-on: ubuntu-latest
-    needs: deploy_staging
+    needs: deploy_staging # requires workflow to have cleared the `deployed_staging` job first
     
     steps:
     
