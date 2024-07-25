@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'web/**'
+      - 'web/**' # Only run the change if it is contained within the "web" folder, prevents the workflow for running on changes to documentation and READme files since the application is contained completely within the web/ folder
   push:
     branches:
       - main
